@@ -110,17 +110,21 @@ class poly(model):
     def __init__(self, degree):
         assert degree >= 0
 
-        if degree == 0:
-            df = lambda x, p0 : p0
-        elif degree == 1:
-            df = lambda x, p0,p1 : p0 + p1*x
-        else:
-            dfuncstr = "df = lambda x," + ",".join(["p%d" % i for i in range(degree+1)]) + " : "
-            funcstr = dfuncstr[1:]
-            funcstr += "p1 + " + " + ".join(["(p%d/%.1f)*x**%d" % (i, i+1,i+1) for i in range(2,degree+1)])
-            dfuncstr += "p0 + p1*x + " + " + ".join(["p%d*x**%d" % (i,i) for i in range(2,degree+1)])
-            exec(dfuncstr)
-            exec(funcstr)
+        def multiply_power(power):
+            if power == 0:
+                return ""
+            elif power == 1:
+                return "*x"
+            else:
+                return "*x**%d" % power
+
+        dfuncstr = "df = lambda x," + ",".join(["p%d" % i for i in range(degree+1)]) + " : "
+        funcstr = dfuncstr[1:]
+        funcstr += " + ".join(["(p%d/%.1f)%s" % (i, i+1,multiply_power(i+1)) for i in range(degree+1)])
+        dfuncstr += " + ".join(["p%d%s" % (i,multiply_power(i)) for i in range(degree+1)])
+        
+        exec(dfuncstr)
+        exec(funcstr)
 
         model.__init__(self, df, f)
 
@@ -135,7 +139,7 @@ class powerlaw(model):
         
         dN/dx = N \frac{-\gamma - 1}{x_{min}} \frac{x}{x_{min}}**\gamma
         
-    where :math:`x_{min} > 0` and :math:`\gamma \lt -1`
+    where :math:`x_{min} > 0` and :math:`\gamma < -1`
     """
     def __init__(self):
         df = lambda x, norm, index, pivot : norm * (-(1+index)/pivot)*(x/pivot)**index
@@ -248,7 +252,7 @@ except ImportError:
 def _prepare_data(x, data, error, integral):
     x = n.asarray(x)
     data = n.asarray(data)
-    if error!=None:
+    if error is not None:
         error = n.asarray(error)
     if integral:
         centers = 0.5*(x[1:]+x[:-1])
