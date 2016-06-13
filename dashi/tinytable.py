@@ -179,7 +179,7 @@ class TinyTable(object):
 
         Internally each cell is indexed by a x_label and a y_label. For the piecewise construction it
         offers the 'add' method. This adds all cells for a given x_label. The order of the x_labels
-        can be determined by order of the add calls. The y_labels are alphabetically sorted.
+        can be determined by order of the add calls. The y_labels are alphabetically sorted if desired.
 
         The render method will convert the table into wiki or html syntax. There one can decide
         if the y_labels should be horizontally or vertically layouted
@@ -205,17 +205,34 @@ class TinyTable(object):
         self.x_labels.append(label)
         self.label_data[label] = kwargs
 
-    def render(self, layout="v", format="wiki",format_cell=lambda x: x):
+    def add_ordered(self,label,odict):
+        """
+            Add a row/column. Label will be added to the x_labels,
+            the parpameters in odict will be added to y_labels.
+            Unlike add, if odict is of type OrderedDict, the order 
+            will be preserved.
+
+            Args:
+                label (str): row/column label
+                odict (dict-type): row/column data
+        """
+
+        pass        
+
+
+    def render(self, layout="v", format="wiki",format_cell=lambda x: x,order_by=lambda x : x):
         """
             render this table into a given output format
 
             layout may be either "h" or "v", for horizontal or vertical layout
             format may bei either "wiki","html" or "rst"
             format_cell is a function which can be used to format the the cell content, e.g. lambda x : "%1.2e" %str(x)
+            order_by (func): passed to sorted as cmp argument
         """
         table_data = defaultdict(dict)
-        y_labels = sorted(self.y_labels)
-   
+        #y_labels = sorted(self.y_labels,cmp=order_by)
+        y_labels = self.y_labels
+
         for x_label in self.x_labels:
             for y_label in y_labels:
                 table_data[x_label][y_label] = format_cell(self.label_data[x_label].get(y_label, ""))

@@ -138,15 +138,17 @@ def h1scatter(self, log=False, cumulative=False, cumdir=1, color=None, different
     
     ax = p.gca()
     if color is None:
-        color = next(ax._get_lines.color_cycle)
-    
+        if hasattr(ax._get_lines, 'prop_cycler'):
+            kwargs['color'] = next(ax._get_lines.prop_cycler)['color']
+        else:
+            color_cycle = ax._get_lines.color_cycle
+            kwargs['color'] = next(color_cycle)
     kw = {
         "xerr" : self.xerr,
         "yerr" : binerror,
         "fmt" : "k",
         "capsize" : 0.,
         "linestyle" : 'None',
-        "color" : color,
     }
     
     kw.update(kwargs)
@@ -275,8 +277,11 @@ def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, fill
         ax._legend_proxy = LegendProxy(ax)
     label = kwargs.pop('label', self.title)
     if color is None:
-        color = next(ax._get_lines.color_cycle)
-    kwargs['color'] = color
+        if hasattr(ax._get_lines, 'prop_cycler'):
+            kwargs['color'] = next(ax._get_lines.prop_cycler)['color']
+        else:
+            color_cycle = ax._get_lines.color_cycle
+            kwargs['color'] = next(color_cycle)
     if filled:
         ax._legend_proxy.add_fill(label=label, **kwargs)
     else:
@@ -542,9 +547,14 @@ def p2dscatter(self, log=False, color=None, label=None, orientation='horizontal'
 
     ax = p.gca()
     if color is None:
-        color = next(ax._get_lines.color_cycle)
-    
-    kw = {"xerr" : self.xerr, "yerr" : self.yerr, "fmt" : "k", "capsize" : 0., "linestyle" : 'None', "color" : color}
+        if hasattr(ax._get_lines, 'prop_cycler'):
+            kwargs['color'] = next(ax._get_lines.prop_cycler)['color']
+        else:
+            color_cycle = ax._get_lines.color_cycle
+            kwargs['color'] = next(color_cycle)
+           
+ 
+    kw = {"xerr" : self.xerr, "yerr" : self.yerr, "fmt" : "k", "capsize" : 0., "linestyle" : 'None',}
     kw.update(kwargs)
     
     if orientation == 'vertical':
