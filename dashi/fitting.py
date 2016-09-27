@@ -60,7 +60,8 @@ class model(object):
             raise ValueError("provide at least x")
         if len(args) == 1 and len(kwargs) == 0:
             getLogger("dashi.fitting").info("use current parameter values") 
-            kwargs.update(self.params)
+        params = dict(self.params)
+        params.update(kwargs)
         # add fixed parameters
         for k in self.fixed:
             if not k in kwargs:
@@ -68,9 +69,9 @@ class model(object):
         if self._integral:
             if self.func is None:
                 raise NotImplementedError("%s has no integral form" % type(self))
-            return self.func(*args, **kwargs)
+            return self.func(*args, **params)
         else:
-            return self.dfunc(*args, **kwargs)
+            return self.dfunc(*args, **params)
 
     def first_guess(self, x, data):
         """
@@ -231,7 +232,10 @@ def _minuit(model, chi2, verbose=True):
     # store results and return model
     model.params.update(minuit.values)
     model.errors.update(minuit.errors)
-    model.cov  = n.asarray( minuit.matrix() )
+    if minuit.covariance is not None:
+        model.cov = n.asarray( minuit.matrix() )
+    else:
+        model.cov = None
     model.chi2 = minuit.fval
 
 _minimize = None
