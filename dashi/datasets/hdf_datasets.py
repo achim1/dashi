@@ -25,9 +25,9 @@ def read_variable(h5file, path):
             
     if ":" in path:
         path_, column = path.split(":")
-        return h5file.getNode(path_).col(column)
+        return h5file.get_node(path_).col(column)
     else:
-        return h5file.getNode(path).read()
+        return h5file.get_node(path).read()
 
 ################################################################################
 

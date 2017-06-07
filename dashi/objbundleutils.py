@@ -95,9 +95,9 @@ def read_hdf(h5file, selection):
         if isinstance(cfg, str):
             if ":" in cfg:
                 path, column = cfg.split(":")
-                arrays[varname] = h5file.getNode(path).col(column)
+                arrays[varname] = h5file.get_node(path).col(column)
             else:
-                arrays[varname] = h5file.getNode(cfg).read()
+                arrays[varname] = h5file.get_node(cfg).read()
         elif callable(cfg):
             args = inspect.getargspec(cfg).args
             if args == ["file"]:
@@ -112,7 +112,7 @@ def bundle2h5group(bundle, file, h5group):
     import tables
     assert isinstance(h5group, str)
     for key,array in bundle:
-        earr = file.createEArray(h5group, key,  
+        earr = file.create_earray(h5group, key,  
                                  tables.Atom.from_dtype(array.dtype), 
                                  (0,), filters=tables.Filters(complevel=6, complib="zlib"), createparents=True)
         earr.append(array)
@@ -123,7 +123,7 @@ def h5group2bundle(file, h5group):
     assert isinstance(h5group, str)
     arrays = dict()
 
-    for key in file.getNode(h5group)._v_children.keys():
-        arrays[key] = file.getNode(h5group+"/"+key).read()
+    for key in file.get_node(h5group)._v_children.keys():
+        arrays[key] = file.get_node(h5group+"/"+key).read()
 
     return bundle(**arrays)
