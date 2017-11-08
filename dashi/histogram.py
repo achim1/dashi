@@ -132,11 +132,27 @@ class histogram(object):
     _h_bincenters = property(lambda self : [ 0.5*(edges[2:-1] + edges[1:-2]) for edges in self._h_binedges],
                              doc="a list of arrays containing the centers of all bins")
     
+    nbins      = property(lambda self: tuple([i-2 for i in self._h_bincontent.shape]), None)
     binedges   = property(lambda self : [i[1:-1] for i in self._h_binedges], None)
     bincenters = property(lambda self : self._h_bincenters, None)
     binwidths = property(lambda self : self._h_binwidths, None)
     binerror   = property(lambda self : n.sqrt(self._h_squaredweights[self._h_visiblerange]), None)
     
+    # present views of the non overflow bins to the outside
+    @property
+    def bincontent(self):
+        return self._h_bincontent[self._h_visiblerange]
+    @bincontent.setter
+    def bincontent(self, v):
+        self._h_bincontent[self._h_visiblerange] = v
+
+    @property
+    def squaredweights(self):
+        return self._h_squaredweights[self._h_visiblerange]
+    @squaredweights.setter
+    def squaredweights(self, v):
+        self._h_squaredweights[self._h_visiblerange] = v
+
     @staticmethod
     def _slice_slab(array, pos):
         ndim = array.ndim
@@ -229,9 +245,6 @@ class histogram(object):
 
         # present views of the non overflow bins to the outside 
         self._h_visiblerange = [slice(1,-1) for i in range(self.ndim)]
-        self.bincontent      = self._h_bincontent[self._h_visiblerange]
-        self.squaredweights  = self._h_squaredweights[self._h_visiblerange]
-        self.nbins           = tuple([i-2 for i in self._h_bincontent.shape])
 
         self._h_newdataavailable = True # internal trigger for the recalculation of dervived values (e.g. errors, stats,..)
 
@@ -433,7 +446,16 @@ class histogram(object):
             return (self * ( 1. / float(other) ) )
         else:
             return self
-            
+        
+    def __truediv__(self, other):
+        "implement histogram / scalar"
+        if not n.isscalar(other):
+            raise ValueError("division is only implemented for scalars")
+        if other != 0:
+            return (self * ( 1. / float(other) ) )
+        else:
+            return self
+        
     def __getitem__(self, slice_):
         """
         implement histogram[index]
@@ -686,6 +708,18 @@ class hist2d(histogram):
 def create(ndim, binedges, bincontent=None, squaredweights=None, labels=None):
     """
     convenience method: create an *ndim*-dimensional histogram
+    
+    :param ndim: number of dimensions
+    :param binedges: a sequence of length ndim, with each element specifying
+                     the bin edges in a particular dimension
+    :param bincontent: if supplied, an ndim-dimensional array to use as storage
+                       for the bin contents. It must include the under- and
+                       overflow-bins, i.e. its shape should be (len(edges)+2
+                       for edges in binedges). If None, a new array will be
+                       created internally.
+    :param squaredweights: if supplied, an array of the same shape as bincontent
+    :param labels: if supplied, a sequence of length ndim containing the labels
+                   for each axis
     """
     kwargs = dict(bincontent=bincontent, squaredweights=squaredweights)
     if labels is None:
