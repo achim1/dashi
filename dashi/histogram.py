@@ -289,7 +289,7 @@ class histogram(object):
 
         # catch nans ...
         if weights is not None:
-            assert len(weights) == len(sample)
+            assert len(weights) == len(sample), "Sample has length {}, but weights have length {}".format(len(sample),len(weights))
             if n.isnan(weights).any():
                 raise ValueError("given weights contain nans!")
 
