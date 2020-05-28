@@ -43,7 +43,7 @@ def _cumsum_with_overflow(bincontent, overflow, func):
         # in a visible bin of another dimension
         idx = [slice(1,-1)]*ndim
         idx[axis] = slice(0,1)
-        cum += n.apply_over_axes(func, oflow, axes[:i])[idx]
+        cum += n.apply_over_axes(func, oflow, axes[:i])[tuple(idx)]
         
     return cum
 
