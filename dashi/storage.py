@@ -5,7 +5,7 @@ from contextlib import contextmanager
 @contextmanager
 def maybe_open_file(path, mode='r'):
     import tables
-    if isinstance(path, basestring):
+    if isinstance(path, str):
         hdf = tables.open_file(path, mode)
         yield hdf
         hdf.close()

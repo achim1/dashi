@@ -103,7 +103,7 @@ def cumdist2(where, data,weights=None):
     result = np.zeros(len(where), dtype=float)
     
     j = 0
-    for i in xrange(len(where)):
+    for i in range(len(where)):
         while (j < len(data)) and (data[j] <= where[i]):
             j += 1
 
@@ -362,15 +362,15 @@ class freq_func(defaultdict):
 
     def __add__(self, other):
         tmp = freq_func()
-        for value, freq in self.iteritems():
+        for value, freq in self.items():
             tmp[value] += freq
-        for value, freq in other.iteritems():
+        for value, freq in other.items():
             tmp[value] += freq
         return tmp
 
     def shift(self, amount):
         tmp = freq_func()
-        for value,freq in self.iteritems():
+        for value,freq in self.items():
             if freq > 0:
                 tmp[value+amount] = freq
 
@@ -424,14 +424,14 @@ def cm_dist_algo1(m,n):
 
     if m != n: # Algorithm 1
         g = dict()
-        for v in xrange(m+1):
+        for v in range(m+1):
             g[(0,v)] = identity(a**2*v*(v+1)*(2*v+1)/6)
-        for u in xrange(1,n+1):
+        for u in range(1,n+1):
             g[(u,0)] = identity(b**2*u*(u+1)*(2*u+1)/6) 
-            print "u: %d/%d" % (u,n)
-            for v in xrange(1,m+1):
+            print("u: %d/%d" % (u,n))
+            for v in range(1,m+1):
                 g[(u,v)] = (g[(u-1,v)] + g[(u,v-1)]).shift( (a*v - b*u)**2 )
-            for v in xrange(0,m+1):
+            for v in range(0,m+1):
                 del g[(u-1,v)]
             sys.stdout.flush()
 
@@ -441,15 +441,15 @@ def cm_dist_algo1(m,n):
     if m == n: # Algorithm 1*
         f = dict()
         f[(0,0)] = identity(0)
-        for i,t in enumerate(xrange(1,2*n+1)):
+        for i,t in enumerate(range(1,2*n+1)):
             x = min(t, 2*n-t)
-            print "%d/%d" % (i, 2*n)
-            for d in xrange(x,-1,-2):
+            print("%d/%d" % (i, 2*n))
+            for d in range(x,-1,-2):
                 if d==t:
                     f[(t,d)] = identity( t*(t+1)*(2*t+1) / 6)
                 else:
                     f[(t,d)] = f[(t-1,d+1)] + f[(t-1,abs(d-1))]
-            for d in xrange(x,-1,-2):
+            for d in range(x,-1,-2):
                 if (t-1,d+1) in f:
                     del f[(t-1,d+1)]
                 if (t-1,abs(d-1)) in f:
@@ -471,7 +471,7 @@ def tail_convolution(f,g,c):
     i = 1
     j = k+1
     r = []
-    for i in xrange(1, k+1):
+    for i in range(1, k+1):
         while v[j-1] >= c-u[i-1] and j > 0:
             j -= 1
         r.append(j+1)
@@ -480,7 +480,7 @@ def tail_convolution(f,g,c):
     G = []
     G[0] = freq_g[r[0]-1 : k+1].sum()
     R = freq_f[0] * G[0]
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         R += freq_f[i] * ( G[i-1] + freq_g[r[i]:r[i-1]].sum() )
 
     return R

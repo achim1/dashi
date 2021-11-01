@@ -42,11 +42,11 @@ class DatasetHub(object):
 
         def get_one_variable(self,varname,current,total, unpack_recarrays=False):
             " helper function that retrieves a single variable"
-            print "  %3d/%d reading variable %s" % (current,total,varname),
+            print("  %3d/%d reading variable %s" % (current,total,varname), end=' ')
             start2 = time.time()
             arrays = {}
             missing_datasets = []
-            for name,dataset in self.datasets.iteritems():
+            for name,dataset in self.datasets.items():
                 tmp = None
                 try:
                     if varname in self.vars and (self.vars[varname].vardef is not None):
@@ -75,18 +75,18 @@ class DatasetHub(object):
                         arrays[name] = tmp
 
             if len(arrays) == 0:
-                print "| done after %d seconds" % (time.time() - start2)
+                print("| done after %d seconds" % (time.time() - start2))
                 return None
             
             # add empty arrays where necessary
             # rationale: empty arrays are easier to handle than bundles with missing keys
             # TODO: maybe make this configureable
             if len(missing_datasets) > 0:  
-                dtype = arrays.values()[0].dtype
+                dtype = list(arrays.values())[0].dtype
                 for name in missing_datasets:
                     arrays[name] = n.zeros(0, dtype=dtype)
-                print "| filling empty keys",
-            print "| done after %d seconds" % (time.time() - start2)
+                print("| filling empty keys", end=' ')
+            print("| done after %d seconds" % (time.time() - start2))
             sys.stdout.flush()
 
             return d.bundle(**arrays)
@@ -94,18 +94,18 @@ class DatasetHub(object):
 
         if isinstance(vars, str):
             tmp = get_one_variable(self, vars, 1,1, unpack_recarrays)
-            print "total time:", time.time()-start
+            print("total time:", time.time()-start)
             return tmp
         elif isinstance(vars, list) and all([isinstance(i, str) for i in vars]):
             bundles = dict( [ (varname, get_one_variable(self, varname,i+1,len(vars),unpack_recarrays)) 
                               for i,varname in enumerate(vars)] )
-            bundles = dict( [ (i,j) for i,j in bundles.iteritems() if j is not None ] )
+            bundles = dict( [ (i,j) for i,j in bundles.items() if j is not None ] )
             if len(bundles) == 0:
-                print "total time:", time.time()-start
+                print("total time:", time.time()-start)
                 return None
             else:
                 tmp =  d.bundle(**bundles)
-                print "total time:", time.time()-start
+                print("total time:", time.time()-start)
                 return tmp
         else:
             raise ValueError("vars must be either a string or a list of strings")
@@ -119,7 +119,7 @@ class DatasetHub(object):
             self.datasets[key]._ds_put(path, bdl.get(key))
 
     def remove(self, path):
-        for key, ds in self.datasets.iteritems():
+        for key, ds in self.datasets.items():
             errors = []
             try:
                 ds._ds_remove_variable(path)
@@ -129,12 +129,12 @@ class DatasetHub(object):
         if len(errors) == len(self.datasets):
             raise ValueError("while removing '%s' got errors from _all_ datasets!" % path)
         elif (0 < len(errors)) and ( len(errors) < len(self.datasets)):
-            print "caught errors while removing '%s' for datasets %s" % (path, " ".join(errors))
+            print("caught errors while removing '%s' for datasets %s" % (path, " ".join(errors)))
 
             
 
     def keys(self):
-        return self.datasets.keys()
+        return list(self.datasets.keys())
 
 
     def print_toc(self, varsonly=False):
@@ -151,8 +151,8 @@ class DatasetHub(object):
             thistoc = self.datasets[dsname]._ds_toc
 
             if varsonly:
-                for vname,v in self.vars.iteritems():
-                    print vname,v
+                for vname,v in self.vars.items():
+                    print(vname,v)
                     if v.vardef in thistoc:
                         global_toc[vname].add(dsname)
                         maxpathlen = max(len(vname), maxpathlen)
@@ -169,15 +169,15 @@ class DatasetHub(object):
             fmt += " " + fmt_substring(len(dsname))
             totsize += len(dsname) + 1
     
-        print fmt % tuple( [""] + keys)
-        print totsize * "-"
+        print(fmt % tuple( [""] + keys))
+        print(totsize * "-")
         for path in sorted(global_toc.keys()):
             def marker(k):
                 if k in global_toc[path]:
                     return "x"
                 else:
                     return "o"
-            print fmt % tuple( [path] + [marker(key) for key in keys])
+            print(fmt % tuple( [path] + [marker(key) for key in keys]))
 
     def get_vars(self, vardef_only=True):
         """
@@ -188,7 +188,7 @@ class DatasetHub(object):
             In this case the keys are returned sort by their vardefs.
         """
         if not vardef_only:
-            return self.vars.keys()
+            return list(self.vars.keys())
         else:
             varcmp = lambda v1,v2 : cmp(self.vars[v1].vardef, self.vars[v2].vardef) # group by hdf tables, may improve speed
             readable =  [ i for i in self.vars.keys() if self.vars[i].vardef is not None ]
@@ -199,6 +199,6 @@ def usermethod(obj):
         wrapper that allows to attach methods to a hub
     """
     def wrapper(method):
-        setattr(obj, method.func_name, new.instancemethod(method, obj, obj.__class__))
+        setattr(obj, method.__name__, new.instancemethod(method, obj, obj.__class__))
 
     return wrapper

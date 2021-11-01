@@ -159,7 +159,7 @@ try:
             if self._ds_toc_cache is None:
                 toc = []
 
-                for path, tableproxy in self.pathes.iteritems():
+                for path, tableproxy in self.pathes.items():
                     toc.append(path)
                     for varname in tableproxy._v_dtype.names:
                         toc.append("%s:%s" % (path, varname))

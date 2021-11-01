@@ -190,10 +190,10 @@ def test_cumulative_bincontent():
                 func = lambda arr, axis: d.histfuncs.cumsum(arr, operator=op, axis=axis)
                 if kind == 'bincontent':
                     cum = d.histfuncs.cumulative_bincontent(h, op)
-                    cum_full = n.apply_over_axes(func, h._h_bincontent, range(h.ndim-1, -1, -1))[h._h_visiblerange]
+                    cum_full = n.apply_over_axes(func, h._h_bincontent, list(range(h.ndim-1, -1, -1)))[h._h_visiblerange]
                 else:
                     cum = d.histfuncs.cumulative_binerror(h, op)
-                    cum_full = n.sqrt(n.apply_over_axes(func, h._h_squaredweights, range(h.ndim-1, -1, -1))[h._h_visiblerange])
+                    cum_full = n.sqrt(n.apply_over_axes(func, h._h_squaredweights, list(range(h.ndim-1, -1, -1)))[h._h_visiblerange])
                 assert((cum == cum_full).all())
                 # assert(False)
     

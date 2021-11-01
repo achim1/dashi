@@ -1,6 +1,6 @@
 
 import numpy as n
-from objbundle import bundle
+from .objbundle import bundle
 import inspect
 
 def ndarray2bundle(array, varselection=None):
@@ -60,7 +60,7 @@ def read_hdf(h5file, selection):
     readorder = [] # list of tuples [(varname, [depvar1, depvar2]) ]
     while len(readorder) != len(selection):
         vars_in_readorder = [i[0] for i in readorder]
-        for varname, cfg in selection.iteritems():
+        for varname, cfg in selection.items():
             if varname in vars_in_readorder:
                 continue
             if isinstance(cfg, str):
@@ -73,7 +73,7 @@ def read_hdf(h5file, selection):
                     # pass h5file, calculation doesn't depend on anything
                     readorder.insert(0, (varname, []) )
                     #print "insert", varname
-                elif all(map(lambda i : i in selection, args)):
+                elif all(i in selection for i in args):
                     #print "considering", varname
                     if all( [i in vars_in_readorder for i in args]):
                         # all deps are there. look for insert position
