@@ -1,9 +1,21 @@
 import os
+import re
+
 from setuptools import setup
+
+def get_version(package):
+    """ 
+    Return package version as listed in `__version__` in `init.py`.
+    """
+    with open(os.path.join(package, '__init__.py'), 'rb') as init_py:
+        src = init_py.read().decode('utf-8')
+        return re.search("__version__ = ['\"]([^'\"]+)['\"]", src).group(1)
+
+version = get_version('dashi')
 
 setup(
     name = "pydashi",
-    version = "1.0.0",
+    version = version,
     author = "The dashi developers",
     author_email = "eike@middell.net",
     description = ("TODO"),
