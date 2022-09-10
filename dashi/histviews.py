@@ -296,7 +296,7 @@ def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, fill
     else:
         kw = {"color":color}
         kw.update(kwargs)
-        artists = p.plot(xpoints, ypoints, "k-", **kw) 
+        artists = p.plot(xpoints, ypoints, "-", **kw) 
     
     _h1label(self)
     
