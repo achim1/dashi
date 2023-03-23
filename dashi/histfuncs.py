@@ -16,7 +16,7 @@ def cumsum(narray, operator='<', axis=None):
         else:
             idx = [slice(None)]*narray.ndim
             idx[axis] = slice(None,None,-1)
-        return (n.cumsum(narray[idx], axis=axis))[idx]
+        return (n.cumsum(narray[tuple(idx)], axis=axis))[tuple(idx)]
     else:
         raise ValueError("Non valid operator chosen! Please choose '<' or '>'")
 
@@ -43,7 +43,7 @@ def _cumsum_with_overflow(bincontent, overflow, func):
         # in a visible bin of another dimension
         idx = [slice(1,-1)]*ndim
         idx[axis] = slice(0,1)
-        cum += n.apply_over_axes(func, oflow, axes[:i])[idx]
+        cum += n.apply_over_axes(func, oflow, axes[:i])[tuple(idx)]
         
     return cum
 
