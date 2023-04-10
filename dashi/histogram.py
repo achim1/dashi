@@ -244,7 +244,7 @@ class histogram(object):
             assert self._h_squaredweights.shape == tuple(datacubeshape)
 
         # present views of the non overflow bins to the outside 
-        self._h_visiblerange = [slice(1,-1) for i in range(self.ndim)]
+        self._h_visiblerange = tuple(slice(1,-1) for i in range(self.ndim))
 
         self._h_newdataavailable = True # internal trigger for the recalculation of dervived values (e.g. errors, stats,..)
 
