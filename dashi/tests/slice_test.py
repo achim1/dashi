@@ -16,12 +16,19 @@ def test_slice_1d():
     assert(hsub.stats.weightsum == 1)
     assert(hsub.labels == h.labels)
     
+    # re-assigning the slice produces the same result
+    empty = h.empty_like()
+    empty[sel] = hsub
+    hsub_new = empty[sel]
+    assert((hsub_new._h_bincontent == hsub._h_bincontent).all())
+    
     # Check that labels are copied
     sel = (1, slice(None), slice(None))
     assert(h[sel].labels == h.labels[1:])
     
     sel = (1, 1, slice(None))
     assert(h[sel].labels == [h.labels[2]])
+    
 
 def test_slice_normalization():
     bins = [numpy.logspace(3, 8, 51), [-1, 10], numpy.linspace(-1, 1, 21)]

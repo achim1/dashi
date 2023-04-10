@@ -5,7 +5,7 @@ from contextlib import contextmanager
 @contextmanager
 def maybe_open_file(path, mode='r'):
     import tables
-    if isinstance(path, basestring):
+    if isinstance(path, str):
         hdf = tables.open_file(path, mode)
         yield hdf
         hdf.close()
@@ -55,8 +55,6 @@ def histsave(histo, path, where, name, overwrite=False, complib='blosc'):
         save(histo._h_bincontent, "_h_bincontent")
         save(histo._h_squaredweights, "_h_squaredweights")
     
-        # file.create_array(group, "_h_bincontent", histo._h_bincontent)
-        # file.create_array(group, "_h_squaredweights", histo._h_squaredweights)
         for dim in range(histo.ndim):
             file.create_array(group, "_h_binedges_%d" % dim, histo._h_binedges[dim])
             attr["label_%d" % dim] = histo.labels[dim]

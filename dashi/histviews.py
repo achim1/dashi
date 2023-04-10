@@ -32,61 +32,6 @@ def _h2label(h2, orientation='horizontal'):
         if (ylabel is not None):
             ax.set_ylabel(ylabel)
 
-class LegendProxy(object):
-    """
-    Provide proxies to draw legend entries for unsupported artist types.
-    """
-    def __init__(self, ax):
-        self.ax = ax
-        # replace Axes.legend() with a call to ourselves
-        ax._legend = ax.legend
-        ax.legend = self.__call__
-        self.artists = []
-        self.labels = []
-    
-    def _validate(self, **kwargs):
-        if not 'label' in kwargs:
-            return False
-        if kwargs['label'] is None or kwargs['label'].startswith('__nolabel'):
-            return False
-        return True
-    
-    def add_line(self, **kwargs):
-        if not self._validate(**kwargs):
-            return
-        line = mpl.lines.Line2D([0,0], [1,1], linewidth=kwargs.get('linewidth', None), color=kwargs.get('color', None), linestyle=kwargs.get('ls', None))
-        self.artists.append(line)
-        self.labels.append(kwargs.get('label', None))
-    
-    def add_fill(self, **kwargs):
-        if not self._validate(**kwargs):
-            return
-        rect = mpl.patches.Rectangle((0, 0), 1, 1, color=kwargs.get('color', None), alpha=kwargs.get('alpha', None))
-        self.artists.append(rect)
-        self.labels.append(kwargs.get('label', None))
-    
-    def add_scatter(self, **kwargs):
-        if not self._validate(**kwargs):
-            return
-        if not 'color' in kwargs:
-            colors = None
-        else:
-            colors = mpl.colors.colorConverter.to_rgba_array(kwargs['color'], 1.0)
-        artist = mpl.collections.AsteriskPolygonCollection(4, 0, [20., 20.], facecolors=colors, edgecolors=colors, offsets=[[0,0], [1,1]])
-        self.artists.append(artist)
-        self.labels.append(kwargs.get('label', None))
-
-    def __call__(self, **kwargs):
-        artists, labels = self.ax.get_legend_handles_labels()
-        for a, l in zip(self.artists, self.labels):
-            if l is not None and not l.startswith('__nolabel'):
-                artists.append(a)
-                labels.append(l)
-        if len(artists) > 0:
-            return self.ax._legend(artists, labels, **kwargs)
-        else:
-            return self.ax._legend(**kwargs) 
-
 def _h1_transform_bins(self, differential=False, cumulative=False, cumdir=1):
     """
     Transform bin contents in errors to values appropriate for a differential
@@ -129,7 +74,7 @@ def _next_color(ax):
     else:
         return None
 
-def h1scatter(self, log=False, cumulative=False, cumdir=1, color=None, differential=False, **kwargs):
+def h1scatter(self, log=False, cumulative=False, cumdir=1, differential=False, **kwargs):
     """ use pylab.errorplot to plot a 1d histogram 
         
         Parameters:
@@ -145,24 +90,14 @@ def h1scatter(self, log=False, cumulative=False, cumdir=1, color=None, different
     bincontent, binerror = _h1_transform_bins(self, differential, cumulative, cumdir)
     
     ax = p.gca()
-    if color is None:
-        color = _next_color(ax)
     
     kw = {
         "xerr" : self.xerr,
         "yerr" : binerror,
-        "fmt" : "k",
         "capsize" : 0.,
         "linestyle" : 'None',
-        "color" : color,
     }
-    
     kw.update(kwargs)
-    
-    if not hasattr(ax, "_legend_proxy"):
-        ax._legend_proxy = LegendProxy(ax)
-    label = kw.pop('label', self.title)
-    ax._legend_proxy.add_scatter(label=label, **kw)
     
     _set_logscale(ax, log)
     
@@ -220,23 +155,15 @@ def h1band(self, log=False, type="steps", differential=False, cumulative=False, 
     ax = p.gca()
     _set_logscale(ax, log)
 
-    ax = p.gca()
-    if not hasattr(ax, "_legend_proxy"):
-        ax._legend_proxy = LegendProxy(ax)
-    label = kwargs.pop('label', self.title)
-    ax._legend_proxy.add_fill(label=label, **kwargs)
-
     kw = {}
     kw.update(kwargs)
     artists = p.fill_between(x, y1, y2, **kw)
 
-    
-    # p.ylim(minvalue, maxvalue)
     _h1label(self)
     
     return artists
 
-def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, filled=False, color=None, orientation='horizontal', **kwargs):
+def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, filled=False, orientation='horizontal', **kwargs):
     """ plot the histogram's  bincontent with a line using pylab.plot. 
         Parameters:
           log    : if true create logartihmic plot
@@ -279,25 +206,13 @@ def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, fill
 
     _set_logscale(ax, log, axis=axis_name)
     
-    if not hasattr(ax, "_legend_proxy"):
-        ax._legend_proxy = LegendProxy(ax)
-    label = kwargs.pop('label', self.title)
-    if color is None:
-        color = _next_color(ax)
-    kwargs['color'] = color
-    if filled:
-        ax._legend_proxy.add_fill(label=label, **kwargs)
-    else:
-        ax._legend_proxy.add_line(label=label, **kwargs)
+    kw = {"label":kwargs.pop('label', self.title)}
+    kw.update(kwargs)
     
     if filled:
-        kw = {"ec":"k", "fc": color}
-        kw.update(kwargs)
         artists = p.fill(xpoints, ypoints, **kw) 
     else:
-        kw = {"color":color}
-        kw.update(kwargs)
-        artists = p.plot(xpoints, ypoints, "k-", **kw) 
+        artists = p.plot(xpoints, ypoints, **kw) 
     
     _h1label(self)
     
@@ -537,7 +452,7 @@ def modparbox(self, axes=None, loc=3, title=None, fontsize=10, **kwargs):
     infobox.draw(axes, loc)
 
 
-def p2dscatter(self, log=False, color=None, label=None, orientation='horizontal', **kwargs):
+def p2dscatter(self, log=False, orientation='horizontal', **kwargs):
     """ use pylab.errorplot to visualize these scatter points
         
         Parameters:
@@ -549,10 +464,8 @@ def p2dscatter(self, log=False, color=None, label=None, orientation='horizontal'
         return
 
     ax = p.gca()
-    if color is None:
-        color = _next_color(ax)
     
-    kw = {"xerr" : self.xerr, "yerr" : self.yerr, "fmt" : "k", "capsize" : 0., "linestyle" : 'None', "color" : color}
+    kw = {"xerr" : self.xerr, "yerr" : self.yerr, "capsize" : 0., "linestyle" : 'None'}
     kw.update(kwargs)
     
     if orientation == 'vertical':
@@ -565,11 +478,7 @@ def p2dscatter(self, log=False, color=None, label=None, orientation='horizontal'
     
     _set_logscale(ax, log, axis=axis_name)
     
-    p.errorbar(x, y, **kw) 
-        
-    if not hasattr(ax, "_legend_proxy"):
-        ax._legend_proxy = LegendProxy(ax)
-    ax._legend_proxy.add_scatter(label=label, color=color)
+    p.errorbar(x, y, **kw)
     
     _h2label(self, orientation)
 

@@ -42,8 +42,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'dashi'
-copyright = u'2010-2014, The dashi developers'
+project = 'dashi'
+copyright = '2010-2014, The dashi developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -180,8 +180,8 @@ htmlhelp_basename = 'dashidoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'dashi.tex', u'dashi Documentation',
-   u'Eike Middell', 'manual'),
+  ('index', 'dashi.tex', 'dashi Documentation',
+   'Eike Middell', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -213,8 +213,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'dashi', u'dashi Documentation',
-     [u'Eike Middell'], 1)
+    ('index', 'dashi', 'dashi Documentation',
+     ['Eike Middell'], 1)
 ]
 
 
