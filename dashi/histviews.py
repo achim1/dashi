@@ -125,7 +125,9 @@ def _next_color(ax):
     if hasattr(ax._get_lines, 'color_cycle'):
         return next(ax._get_lines.color_cycle)
     elif 'color' in ax._get_lines._prop_keys:
-        return next(ax._get_lines.prop_cycler)['color']
+        # fix for newer versions of matplotlib
+        #return next(ax._get_lines.prop_cycler)['color']
+        return  ax._get_lines.get_next_color() 
     else:
         return None
 
