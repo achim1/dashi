@@ -19,8 +19,8 @@ class VisualCutter(object):
         self.vars = varbundle
         self.weights = weights
 
-        self.varnames = self.vars.keys()
-        self.catnames = self.vars.transpose().keys()
+        self.varnames = list(self.vars.keys())
+        self.catnames = list(self.vars.transpose().keys())
 
         self.initfunc = initfunc
         self.updatefunc = updatefunc
@@ -37,17 +37,17 @@ class VisualCutter(object):
         placeholders = re.findall("\%\((\w+)\)\w", cutstring)
         for ph in placeholders:
             if ph not in self.varnames:
-                print "Couldn't identify key %s. Set range in self.ranges manually!" % ph
+                print("Couldn't identify key %s. Set range in self.ranges manually!" % ph)
                 self.ranges[ph] = None
             else:
-                mi = n.nanmin( self.vars.get(ph).map(n.nanmin).values())
-                ma = n.nanmax( self.vars.get(ph).map(n.nanmax).values())
+                mi = n.nanmin( list(self.vars.get(ph).map(n.nanmin).values()))
+                ma = n.nanmax( list(self.vars.get(ph).map(n.nanmax).values()))
                 self.ranges[ph] = (mi,ma)
 
 
 
     def run(self):
-        for varname,range in self.ranges.iteritems():
+        for varname,range in self.ranges.items():
             if range is None:
                 raise ValueError("no range specified for slider %s." % varname)
 
@@ -67,7 +67,7 @@ class VisualCutter(object):
         space = .05
         height = (1. - (len(self.ranges)+2)*space) / float(len(self.ranges))
         
-        for i,(varname,range) in enumerate(self.ranges.iteritems()):
+        for i,(varname,range) in enumerate(self.ranges.items()):
             ax = p.axes([0.25, 1-float(i+1)*(space+height), 0.5, height])
             slider = Slider(ax, varname, range[0],range[1], valinit=(range[1]-range[0])/2.)
             slider.on_changed(update)
@@ -104,7 +104,7 @@ def test():
         vc.myfig.canvas.draw()
 
     def anyfunc(*args):
-        print args
+        print(args)
 
     c = VisualCutter(vars,weights, "(vars.var1 > %(var1)s) & (vars.var2 < %(var2)s)", initfunc, updatefunc)
     c.run()

@@ -18,10 +18,10 @@ Installation
 
 The easiest way to install dashi is with `pip`::
 
-	pip install https://github.com/emiddell/dashi/zipball/master
+	pip install https://github.com/IceCube-SPNO/dashi/zipball/master
 
 Documentation
 =============
 
 - `Documentation <https://dashi.readthedocs.org/>`_
-- `Examples <https://github.com/emiddell/dashi/tree/master/dashi/examples/>`_
+- `Examples <https://github.com/IceCube-SPNO/dashi/tree/master/dashi/examples/>`_

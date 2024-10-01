@@ -244,7 +244,7 @@ class histogram(object):
             assert self._h_squaredweights.shape == tuple(datacubeshape)
 
         # present views of the non overflow bins to the outside 
-        self._h_visiblerange = tuple([slice(1,-1) for i in range(self.ndim)])
+        self._h_visiblerange = tuple(slice(1,-1) for i in range(self.ndim))
 
         self._h_newdataavailable = True # internal trigger for the recalculation of dervived values (e.g. errors, stats,..)
 
@@ -509,6 +509,48 @@ class histogram(object):
             new._h_squaredweights[target_slice] = self._h_squaredweights[slice_]
     
         return new
+    
+    def __setitem__(self, slice_, hist):
+        """
+        implement histogram[index] = other
+        """
+        target_slice = list()
+        for i, sl in enumerate(slice_):
+            if isinstance(sl, slice):
+                # we don't handle strides at the moment
+                assert(slice_[i].step is None or slice_[i].step == 1)
+                
+                subedge = self._h_binedges[i]
+                start, stop = slice_[i].start, slice_[i].stop
+                # convert bin indices into left- and right-edge indices
+                if start is not None and start < 0:
+                    start -= 1
+                if stop is not None and stop >= 0:
+                    stop += 1
+                
+                subedge = subedge[slice(start, stop)]
+                
+                to_cat = [subedge]
+                target = slice(None)
+                # Retain over-underflow bins (empty if outside the slice)
+                if not n.isinf(subedge[0]):
+                    to_cat = [-n.inf] + to_cat
+                    target = slice(1,None)
+                if not n.isinf(subedge[-1]):
+                    to_cat = to_cat + [n.inf]
+                    target = slice(target.start, -1)
+                if len(to_cat) > 1:
+                    subedge = n.hstack(to_cat)
+                
+                if not (subedge == hist._h_binedges[i]).all():
+                    raise ValueError("Source and destination bin edges must match")
+                
+                target_slice.append(target)
+            else:
+                target_slice.append(slice_[i])
+        
+        self._h_bincontent[slice_] = hist._h_bincontent[target_slice]
+        self._h_squaredweights[slice_] = hist._h_squaredweights[target_slice]
     
     def project(self, dims=[-1]):
         """

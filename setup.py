@@ -18,6 +18,7 @@ setup(
     version = version,
     author = "The dashi developers",
     author_email = "eike@middell.net",
+    python_requires = '>=3',
     description = ("TODO"),
     license = "LGPL",
     #keywords = "histograms fitting ",
@@ -29,6 +30,6 @@ setup(
         "Topic :: Scientific/Engineering",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
-        "Programming Language :: Python :: 2.7"
+        "Programming Language :: Python :: 3"
     ],
 )
