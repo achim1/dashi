@@ -1,6 +1,6 @@
 
 import numpy as n
-from objbundle import bundle
+from .objbundle import bundle
 import inspect
 
 def ndarray2bundle(array, varselection=None):
@@ -60,7 +60,7 @@ def read_hdf(h5file, selection):
     readorder = [] # list of tuples [(varname, [depvar1, depvar2]) ]
     while len(readorder) != len(selection):
         vars_in_readorder = [i[0] for i in readorder]
-        for varname, cfg in selection.iteritems():
+        for varname, cfg in selection.items():
             if varname in vars_in_readorder:
                 continue
             if isinstance(cfg, str):
@@ -68,12 +68,12 @@ def read_hdf(h5file, selection):
                 readorder.insert(0, (varname, [] ))
                 #print "insert", varname
             elif callable(cfg):
-                args = inspect.getargspec(cfg).args
+                args = inspect.getfullargspec(cfg).args
                 if args == ["file"]:
                     # pass h5file, calculation doesn't depend on anything
                     readorder.insert(0, (varname, []) )
                     #print "insert", varname
-                elif all(map(lambda i : i in selection, args)):
+                elif all(i in selection for i in args):
                     #print "considering", varname
                     if all( [i in vars_in_readorder for i in args]):
                         # all deps are there. look for insert position
@@ -95,11 +95,11 @@ def read_hdf(h5file, selection):
         if isinstance(cfg, str):
             if ":" in cfg:
                 path, column = cfg.split(":")
-                arrays[varname] = h5file.getNode(path).col(column)
+                arrays[varname] = h5file.get_node(path).col(column)
             else:
-                arrays[varname] = h5file.getNode(cfg).read()
+                arrays[varname] = h5file.get_node(cfg).read()
         elif callable(cfg):
-            args = inspect.getargspec(cfg).args
+            args = inspect.getfullargspec(cfg).args
             if args == ["file"]:
                 arrays[varname] = cfg(h5file)
             else:
@@ -112,7 +112,7 @@ def bundle2h5group(bundle, file, h5group):
     import tables
     assert isinstance(h5group, str)
     for key,array in bundle:
-        earr = file.createEArray(h5group, key,  
+        earr = file.create_earray(h5group, key,  
                                  tables.Atom.from_dtype(array.dtype), 
                                  (0,), filters=tables.Filters(complevel=6, complib="zlib"), createparents=True)
         earr.append(array)
@@ -123,7 +123,7 @@ def h5group2bundle(file, h5group):
     assert isinstance(h5group, str)
     arrays = dict()
 
-    for key in file.getNode(h5group)._v_children.keys():
-        arrays[key] = file.getNode(h5group+"/"+key).read()
+    for key in file.get_node(h5group)._v_children.keys():
+        arrays[key] = file.get_node(h5group+"/"+key).read()
 
     return bundle(**arrays)

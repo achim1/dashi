@@ -5,7 +5,7 @@ from contextlib import contextmanager
 @contextmanager
 def maybe_open_file(path, mode='r'):
     import tables
-    if isinstance(path, basestring):
+    if isinstance(path, str):
         hdf = tables.open_file(path, mode)
         yield hdf
         hdf.close()
@@ -28,16 +28,16 @@ def histsave(histo, path, where, name, overwrite=False, complib='blosc'):
     """
     import tables
     with maybe_open_file(path, 'a') as file:
-        parentgroup = file.getNode(where)
+        parentgroup = file.get_node(where)
 
         if name in parentgroup._v_children:
             if not overwrite:
                 raise ValueError("there exists already a histogram with name %s" % name)
             else:
-                file.removeNode(parentgroup, name, recursive=True)
+                file.remove_node(parentgroup, name, recursive=True)
 
         # create a new group and store all necessary arrays into it
-        group = file.createGroup(where, name)
+        group = file.create_group(where, name)
         attr = group._v_attrs
 
         attr["ndim"]  = histo.ndim
@@ -49,16 +49,14 @@ def histsave(histo, path, where, name, overwrite=False, complib='blosc'):
 
         def save(arr, where):
             filters = tables.Filters(complib=complib, complevel=9)
-            ca = file.createCArray(group, where, tables.Atom.from_dtype(arr.dtype), arr.shape, filters=filters)
+            ca = file.create_carray(group, where, tables.Atom.from_dtype(arr.dtype), arr.shape, filters=filters)
             ca[:] = arr
 
         save(histo._h_bincontent, "_h_bincontent")
         save(histo._h_squaredweights, "_h_squaredweights")
     
-        # file.createArray(group, "_h_bincontent", histo._h_bincontent)
-        # file.createArray(group, "_h_squaredweights", histo._h_squaredweights)
         for dim in range(histo.ndim):
-            file.createArray(group, "_h_binedges_%d" % dim, histo._h_binedges[dim])
+            file.create_array(group, "_h_binedges_%d" % dim, histo._h_binedges[dim])
             attr["label_%d" % dim] = histo.labels[dim]
 
 
@@ -70,11 +68,11 @@ def histload(path, histgroup):
                     the latter, the file will be opened in read-only mode and
                     closed before the function returns
         histgroup : the group containing the histogram (the one created by histsave)
-                    can be anything what file.getNode accepts, eg. a string or a Group 
+                    can be anything what file.get_node accepts, eg. a string or a Group 
                     object
     """
     with maybe_open_file(path) as file:
-        group = file.getNode(histgroup)
+        group = file.get_node(histgroup)
         attr = group._v_attrs
         histo = None
     
