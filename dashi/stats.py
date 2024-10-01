@@ -428,7 +428,7 @@ def cm_dist_algo1(m,n):
             g[(0,v)] = identity(a**2*v*(v+1)*(2*v+1)/6)
         for u in xrange(1,n+1):
             g[(u,0)] = identity(b**2*u*(u+1)*(2*u+1)/6) 
-            print "u: %d/%d" % (u,n)
+            print (f"u: {u}/{n}")
             for v in xrange(1,m+1):
                 g[(u,v)] = (g[(u-1,v)] + g[(u,v-1)]).shift( (a*v - b*u)**2 )
             for v in xrange(0,m+1):
@@ -443,7 +443,7 @@ def cm_dist_algo1(m,n):
         f[(0,0)] = identity(0)
         for i,t in enumerate(xrange(1,2*n+1)):
             x = min(t, 2*n-t)
-            print "%d/%d" % (i, 2*n)
+            print ("{i}/{2*n}")
             for d in xrange(x,-1,-2):
                 if d==t:
                     f[(t,d)] = identity( t*(t+1)*(2*t+1) / 6)

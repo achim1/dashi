@@ -2,7 +2,7 @@
 dashi documentations goes here
 """
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 from . import histfactory as factory
 from .fitting import model,gaussian,poly,leastsq #,poissonllh 

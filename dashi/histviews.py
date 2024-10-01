@@ -122,14 +122,15 @@ def _set_logscale(ax, log=True, axis='y'):
             ax.yaxis.set_major_locator(PaddedLogLocator())
 
 def _next_color(ax):
-    if hasattr(ax._get_lines, 'color_cycle'):
-        return next(ax._get_lines.color_cycle)
-    elif 'color' in ax._get_lines._prop_keys:
-        # fix for newer versions of matplotlib
-        #return next(ax._get_lines.prop_cycler)['color']
-        return  ax._get_lines.get_next_color() 
-    else:
-        return None
+    return ax._get_lines.get_next_color()
+    #if hasattr(ax._get_lines, 'color_cycle'):
+    #    return next(ax._get_lines.color_cycle)
+    #elif 'color' in ax._get_lines._prop_keys:
+    #    # fix for newer versions of matplotlib
+    #    #return next(ax._get_lines.prop_cycler)['color']
+    #    return  ax._get_lines.get_next_color() 
+    #else:
+    #    return None
 
 def h1scatter(self, log=False, cumulative=False, cumdir=1, color=None, differential=False, **kwargs):
     """ use pylab.errorplot to plot a 1d histogram 
@@ -156,6 +157,7 @@ def h1scatter(self, log=False, cumulative=False, cumdir=1, color=None, different
         "fmt" : "k",
         "capsize" : 0.,
         "linestyle" : 'None',
+        "color"     : color
     }
     
     kw.update(kwargs)
@@ -237,15 +239,25 @@ def h1band(self, log=False, type="steps", differential=False, cumulative=False, 
     
     return artists
 
-def h1line(self, log=False, cumulative=False, differential=False, cumdir=1, filled=False, color=None, orientation='horizontal', **kwargs):
-    """ plot the histogram's  bincontent with a line using pylab.plot. 
-        Parameters:
-          log    : if true create logartihmic plot
-          cumulative : plot the cumulative histogram
-          filled : if true fill the region below the line 
+def h1line(self,\
+           log=False,\
+           cumulative=False,\
+           differential=False,\
+           cumdir=1,\
+           filled=False,\
+           color=None,\
+           orientation='horizontal',\
+           **kwargs):
+    """ 
+    Plot the histogram's  bincontent with a line using pylab.plot. 
+    
+    # Keyword Arguments:
+        log        : if true create logartihmic plot
+        cumulative : plot the cumulative histogram
+        filled     : if true fill the region below the line 
 
-          (all other kwargs will be passed to pylab.plot or pylab.fill)
-          Note: pylab.plot and pylab.fill take quite different kwargs.
+        (all other kwargs will be passed to pylab.plot or pylab.fill)
+        Note: pylab.plot and pylab.fill take quite different kwargs.
     """
     
     bincontent, binerror = _h1_transform_bins(self, differential, cumulative, cumdir)
