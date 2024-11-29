@@ -173,7 +173,7 @@ def h1line(self,\
            differential=False,\
            cumdir=1,\
            filled=False,\
-           color=None,\
+           #color=None,\
            orientation='horizontal',\
            **kwargs):
     """ 
