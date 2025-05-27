@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "pydashi"
 dynamic = ["version"]
 description = "TODO"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     { name = "The dashi developers", email = "eike@middell.net" },

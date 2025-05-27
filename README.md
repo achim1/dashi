@@ -1,8 +1,5 @@
-=====
-dashi
-=====
+# dashi 
 
-|docs|
 
 Elaborate data analyses are possible with the functionality offered by the great
 `numpy <http://numpy.scipy.org/>`_, `matplotlib
@@ -13,15 +10,11 @@ limited. Dashi is intended to be a thin wrapper around these libraries to
 provide some useful tools for these problems without obstructing the user the access
 to the underlying libraries and without being a dependency sink.
 
-Installation
-============
+# Installation
 
 The easiest way to install dashi is with `pip`::
 
-	pip install https://github.com/IceCube-SPNO/dashi/zipball/master
+	pip install pydashi
 
-Documentation
-=============
+# Documentation
 
-- `Documentation <https://dashi.readthedocs.org/>`_
-- `Examples <https://github.com/IceCube-SPNO/dashi/tree/master/dashi/examples/>`_
