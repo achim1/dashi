@@ -1,5 +1,4 @@
-# dashi 
-
+# dashi & kanidashi 
 
 Elaborate data analyses are possible with the functionality offered by the great
 `numpy <http://numpy.scipy.org/>`_, `matplotlib
@@ -24,6 +23,12 @@ This allows for a performance boost of XX for a XX dataset using `.fill()`
 
 The project is currently in an early alpha stage, for production use the original 
 dashi library is recommended. 
+
+## Rust API 
+
+The kanidashi histograms thinly wrap the great ndhistogram library from rust. This 
+API can be accessed from the rust end (just add the kanidashi crate to your Cargo.toml)
+and then dashi's rich python API can be used from the python side.
 
 # Installation
 
